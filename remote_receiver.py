@@ -9,7 +9,7 @@ import urllib.request
 import tempfile
 import tkinter as tk
 from tkinter import Label
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageOps
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 from ctypes import cast, POINTER
 from comtypes import CLSCTX_ALL
@@ -182,7 +182,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                             max_height = int(screen_height * 0.6)
 
                             if img_width > max_width or img_height > max_height:
-                                img.thumbnail((max_width, max_height), Image.ANTIALIAS)
+                                img.thumbnail((max_width, max_height), Image.Resampling.LANCZOS)
                                 img_width, img_height = img.size
                             x = random.randint(0, screen_width - img_width)
                             y = random.randint(0, screen_height - img_height)
