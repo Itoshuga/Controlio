@@ -172,7 +172,18 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                             screen_height = root.winfo_screenheight()
 
                             img = Image.open(tmp_path)
+
+                            # Redimensionner si l'image est trop grande
+                            screen_width = root.winfo_screenwidth()
+                            screen_height = root.winfo_screenheight()
                             img_width, img_height = img.size
+
+                            max_width = int(screen_width * 0.6)
+                            max_height = int(screen_height * 0.6)
+
+                            if img_width > max_width or img_height > max_height:
+                                img.thumbnail((max_width, max_height), Image.ANTIALIAS)
+                                img_width, img_height = img.size
                             x = random.randint(0, screen_width - img_width)
                             y = random.randint(0, screen_height - img_height)
 
