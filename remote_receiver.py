@@ -43,7 +43,6 @@ def unmute_volume():
 def play_sound(name):
     filepath = os.path.join(ASSETS_DIR, "sounds", f"{name}.mp3")
     if os.path.exists(filepath):
-        set_max_volume()
         pygame.mixer.music.load(filepath)
         pygame.mixer.music.play()
     else:
