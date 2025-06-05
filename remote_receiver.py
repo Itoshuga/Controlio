@@ -4,6 +4,7 @@ import os
 import random
 import pyautogui
 import threading
+import ctypes
 import webbrowser
 import urllib.request
 import tempfile
@@ -146,6 +147,8 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
             elif data == "volume:unmute":
                 unmute_volume()
+            elif data == "lock":
+                os.system("rundll32.exe user32.dll,LockWorkStation")
             elif data.startswith("image_url:"):
                 url = data.split("image_url:")[1]
 
@@ -201,4 +204,38 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                         print(f"❌ Erreur affichage image : {e}")
 
                 threading.Thread(target=show_image_from_url, args=(url,)).start()
+            elif data.startswith("set_wallpaper:"):
+                url = data.split("set_wallpaper:")[1]
+
+                def set_wallpaper_from_url(image_url):
+                    try:
+                        # Télécharger l'image avec un header User-Agent
+                        req = urllib.request.Request(
+                            image_url,
+                            headers={"User-Agent": "Mozilla/5.0"}
+                        )
+                        with urllib.request.urlopen(req) as response:
+                            image_data = response.read()
+
+                        # Enregistrer l'image dans un fichier temporaire
+                        with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp_img:
+                            tmp_img.write(image_data)
+                            tmp_img_path = tmp_img.name
+
+                        # Convertir en BMP
+                        from PIL import Image
+                        img = Image.open(tmp_img_path)
+                        bmp_path = tmp_img_path.replace(".jpg", ".bmp")
+                        img.save(bmp_path, "BMP")
+
+                        # Appliquer le fond d'écran
+                        ctypes.windll.user32.SystemParametersInfoW(20, 0, bmp_path, 3)
+                        print("✅ Fond d’écran appliqué avec succès")
+
+                    except Exception as e:
+                        print(f"❌ Erreur fond d’écran : {e}")
+
+                threading.Thread(target=set_wallpaper_from_url, args=(url,)).start()
+
+
 

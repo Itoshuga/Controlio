@@ -109,11 +109,16 @@ ttk.Label(frame_actions, text="Commandes rapides à exécuter sur le PC distant 
 ttk.Button(frame_actions, text="🌀 Afficher un Emolio", command=lambda: send_command("emolio")).pack(fill=tk.X, padx=40, pady=5)
 ttk.Button(frame_actions, text="🖱 Bouger la souris", command=lambda: send_command("move_mouse")).pack(fill=tk.X, padx=40, pady=5)
 ttk.Button(frame_actions, text="🛠 Ouvrir page de travail", command=lambda: send_command("work")).pack(fill=tk.X, padx=40, pady=5)
-ttk.Button(
-    frame_actions,
-    text="🖼 Afficher une image depuis un lien",
-    command=lambda: ask_image_url()
-).pack(fill=tk.X, padx=40, pady=5)
+ttk.Button(frame_actions, text="🔒 Verrouiller la session", command=lambda: send_command("lock")).pack(fill=tk.X, padx=40, pady=5)
+ttk.Button(frame_actions, text="🖼 Changer le fond d'écran", command=lambda: ask_wallpaper_url()).pack(fill=tk.X, padx=40, pady=5)
+ttk.Button(frame_actions, text="🖼 Afficher une image depuis un lien", command=lambda: ask_image_url()).pack(fill=tk.X, padx=40, pady=5)
+
+def ask_wallpaper_url():
+    url = simpledialog.askstring("Lien du fond d'écran", "Entre l’URL de l’image (.jpg / .png) :")
+    if url and (url.endswith(".png") or url.endswith(".jpg") or url.endswith(".jpeg")):
+        send_command(f"set_wallpaper:{url}")
+    elif url:
+        log("❌ Lien non valide (doit être .jpg/.png)")
 
 def ask_image_url():
     url = simpledialog.askstring("Lien de l’image", "Entre l’URL de l’image (.png / .jpg) à afficher :")
