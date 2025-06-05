@@ -1,7 +1,6 @@
 import socket
 import tkinter as tk
 from tkinter import ttk, scrolledtext
-import os
 
 PORT = 5001
 AVAILABLE_SOUNDS = ["plane", "fart", "bip", "warning", "rizz", "vine"]
@@ -45,7 +44,7 @@ def log(message):
 
 root = tk.Tk()
 root.title("🎮 Contrôle Distant")
-root.geometry("600x600")
+root.geometry("600x650")
 root.resizable(False, False)
 
 style = ttk.Style()
@@ -80,14 +79,14 @@ ip_choice.bind("<<ComboboxSelected>>", update_ip_entry)
 notebook = ttk.Notebook(root)
 notebook.pack(fill=tk.BOTH, expand=True, padx=20, pady=10)
 
-# Onglet Sons
+# 🔊 Onglet Sons
 frame_sound = ttk.Frame(notebook)
 notebook.add(frame_sound, text="🔊 Sons")
 ttk.Label(frame_sound, text="Sélectionnez un son à jouer sur le PC distant :").pack(pady=10)
 for sound in AVAILABLE_SOUNDS:
     ttk.Button(frame_sound, text=f"▶ {sound}", command=lambda s=sound: send_sound(s)).pack(fill=tk.X, padx=50, pady=2)
 
-# Onglet Parole
+# 💬 Onglet Parole
 frame_speak = ttk.Frame(notebook)
 notebook.add(frame_speak, text="💬 Faire parler")
 ttk.Label(frame_speak, text="Texte à faire dire au PC distant :").pack(anchor='w', pady=5, padx=10)
@@ -95,7 +94,7 @@ speak_text = tk.Text(frame_speak, height=5, wrap="word")
 speak_text.pack(fill=tk.X, padx=10, pady=5)
 ttk.Button(frame_speak, text="Parler", command=send_speak).pack(anchor='e', padx=10)
 
-# Onglet Message
+# 📩 Onglet Message
 frame_msg = ttk.Frame(notebook)
 notebook.add(frame_msg, text="📩 Message popup")
 ttk.Label(frame_msg, text="Message à afficher en popup sur le PC distant :").pack(anchor='w', pady=5, padx=10)
@@ -103,17 +102,34 @@ message_text = tk.Text(frame_msg, height=5, wrap="word")
 message_text.pack(fill=tk.X, padx=10, pady=5)
 ttk.Button(frame_msg, text="Afficher", command=send_message).pack(anchor='e', padx=10)
 
-# 🔥 Onglet Actions combinées
+# ⚡ Onglet Actions (Emolio, Souris, Travail)
 frame_actions = ttk.Frame(notebook)
 notebook.add(frame_actions, text="⚡ Actions")
-
 ttk.Label(frame_actions, text="Commandes rapides à exécuter sur le PC distant :").pack(pady=10)
-
 ttk.Button(frame_actions, text="🌀 Afficher un Emolio", command=lambda: send_command("emolio")).pack(fill=tk.X, padx=40, pady=5)
 ttk.Button(frame_actions, text="🖱 Bouger la souris", command=lambda: send_command("move_mouse")).pack(fill=tk.X, padx=40, pady=5)
 ttk.Button(frame_actions, text="🛠 Ouvrir page de travail", command=lambda: send_command("work")).pack(fill=tk.X, padx=40, pady=5)
 
-# Console
+# 🎚️ Onglet Volume
+frame_volume = ttk.Frame(notebook)
+notebook.add(frame_volume, text="🎚️ Volume")
+ttk.Label(frame_volume, text="Contrôlez le volume du PC distant :").pack(pady=10)
+
+volume_levels = [("25%", 0.25), ("50%", 0.5), ("75%", 0.75), ("100%", 1.0)]
+for label, level in volume_levels:
+    ttk.Button(
+        frame_volume,
+        text=f"🔉 Volume {label}",
+        command=lambda lvl=level: send_command(f"volume:set:{lvl}")
+    ).pack(fill=tk.X, padx=50, pady=3)
+
+ttk.Separator(frame_volume).pack(fill=tk.X, padx=20, pady=10)
+
+ttk.Button(frame_volume, text="🔇 Mute", command=lambda: send_command("volume:mute")).pack(fill=tk.X, padx=50, pady=3)
+ttk.Button(frame_volume, text="🔈 Unmute", command=lambda: send_command("volume:unmute")).pack(fill=tk.X, padx=50, pady=3)
+
+
+# 🖥 Console
 frame_console = ttk.LabelFrame(root, text="Console", padding=10)
 frame_console.pack(fill=tk.BOTH, expand=False, padx=20, pady=(0, 15))
 console = scrolledtext.ScrolledText(frame_console, height=8, state='disabled', font=("Courier", 10))
