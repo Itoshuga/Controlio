@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk, scrolledtext, simpledialog
 
 PORT = 5001
-AVAILABLE_SOUNDS = ["plane", "fart", "bip", "warning", "rizz", "vine"]
+AVAILABLE_SOUNDS = ["plane", "fart", "bip", "warning", "rizz", "vine", "mimimimi"]
 
 def send_command(command):
     ip = ip_entry.get().strip()
