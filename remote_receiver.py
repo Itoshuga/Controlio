@@ -22,7 +22,7 @@ def set_max_volume():
     volume = cast(interface, POINTER(IAudioEndpointVolume))
     if volume.GetMute():
         volume.SetMute(0, None)
-    volume.SetMasterVolumeLevelScalar(1.0, None)
+    volume.SetMasterVolumeLevelScalar(0.3, None)
 
 def play_sound(name):
     filepath = os.path.join(ASSETS_DIR, "sounds", f"{name}.mp3")
